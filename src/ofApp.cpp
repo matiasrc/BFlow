@@ -6,7 +6,7 @@ using namespace cv;
 void ofApp::setup() {
     ofSetFrameRate(60);
     //ofSetLogLevel(OF_LOG_VERBOSE);
-	ofSetVerticalSync(true);
+	//ofSetVerticalSync(true);
     
     //----------------- XML -------------------
     loadSettings();
@@ -36,9 +36,7 @@ void ofApp::setup() {
     gui.setup();
     
     ImGui::GetIO().MouseDrawCursor = false;
-    
-    fullScreen = false;
-    
+        
     //----------------- OSC -------------------
     
     sender.setup(host, puertoOUT);
@@ -68,20 +66,22 @@ void ofApp::update() {
         flow.setPolySigma(fbPolySigma);
         flow.setUseGaussian(fbUseGaussian);
         
+       
         flow.calcOpticalFlow(camPixels);
+
         
         // -------- OSC---------
         glm::vec2 totalFlow = flow.getTotalFlow();
         vector <float> totalFlowData;
         totalFlowData.push_back(totalFlow.x);
         totalFlowData.push_back(totalFlow.y);
-        enviarOsc("/totalFlow", totalFlowData);
+        enviarOsc(etiquetaTotalFlow, totalFlowData);
         
         glm::vec2 averageFlow = flow.getAverageFlow();
         vector <float> averagelFlowData;
         averagelFlowData.push_back(averageFlow.x);
         averagelFlowData.push_back(averageFlow.y);
-        enviarOsc("/averageFlow", averagelFlowData);
+        enviarOsc(etiquetaAverageFlow, averagelFlowData);
         
         int totalAreas = areas.size();
         
@@ -115,8 +115,8 @@ void ofApp::update() {
             averageFlowInRegionData.push_back(rw);
             averageFlowInRegionData.push_back(rh);
             
-            enviarOsc("/totalFlowInRegion", totalFlowInRegionData);
-            enviarOsc("/averageFlowInRegion", averageFlowInRegionData);
+            enviarOsc(etiquetaTotalFlowInRegion, totalFlowInRegionData);
+            enviarOsc(etiquetaAverageFlowInRegion, averageFlowInRegionData);
         }
     }
     
@@ -126,7 +126,7 @@ void ofApp::update() {
         
         ofxOscMessage m = inMessages[0];
         
-        if(m.getAddress() == "/toBflow/averageFlowInRegion"){
+        if(m.getAddress() == etiquetaToRegion){
 
             if(m.getNumArgs() == 5){
                 // both the arguments are floats
@@ -145,14 +145,14 @@ void ofApp::update() {
                 averageFlowInRegionData.push_back(averageFlowInRegion.x);
                 averageFlowInRegionData.push_back(averageFlowInRegion.y);
                 
-                enviarOsc("/fromBflow/averageFlowInRegion", averageFlowInRegionData);
+                enviarOsc(etiquetaFromRegion, averageFlowInRegionData);
             }
         }
-        else if(m.getAddress() == "/toBflow/flowInPosition"){
+        else if(m.getAddress() == etiquetaToPosition){
 
             if(m.getNumArgs() == 3){
                 
-                // both the arguments are floats
+                // arguments are floats
                 float id = m.getArgAsFloat(0);
                 float x = m.getArgAsFloat(1);
                 float y = m.getArgAsFloat(2);
@@ -165,7 +165,7 @@ void ofApp::update() {
                 flowInPositionData.push_back(flowInPosition.x);
                 flowInPositionData.push_back(flowInPosition.y);
                 
-                enviarOsc("/fromBflow/flowInPosition", flowInPositionData);
+                enviarOsc(etiquetaFromPosition, flowInPositionData);
             }
         }
         inMessages.erase(inMessages.begin());
@@ -184,8 +184,6 @@ void ofApp::update() {
             }
         }
     }
-    
-    ofSetFullscreen(fullScreen);
 }
 
 void ofApp::draw() {
@@ -329,11 +327,16 @@ void ofApp::loadSettings(){
     etiquetaAverageFlowInRegion = XML.getValue("OSC:ETIQUETA:AVERAGEFLOWINREGION", "/bflow/averageflowinregion");
     enviarAverageFlowInRegion = XML.getValue("OSC:ENVIARAVERAGEFLOWINREGION", true);
     
-    etiquetaFlowInRegion = XML.getValue("OSC:ETIQUETA:FLOWINREGION", "/bflow/flowinregion");
+    etiquetaToRegion = XML.getValue("OSC:ETIQUETA:TOREGION", "/tobflow/flowinregion");
     enviarFlowInRegion = XML.getValue("OSC:ENVIARFLOWINREGION", true);
     
-    etiquetaFlowInPosition = XML.getValue("OSC:ETIQUETA:FLOWINPOSITION", "/bflow/flowinposition");
+    etiquetaToPosition = XML.getValue("OSC:ETIQUETA:TOPOSITION", "/tobflow/flowinposition");
     enviarFlowInPosition = XML.getValue("OSC:ENVIARFLOWINPOSITION", true);
+    
+    etiquetaFromRegion = XML.getValue("OSC:ETIQUETA:FROMREGION", "/frombflow/flowinregion");
+    
+    etiquetaFromPosition = XML.getValue("OSC:ETIQUETA:FROMPOSITION", "/frombflow/flowinposition");
+    
     //---------------- CAM --------------------
     deviceID = XML.getValue("CAM:DEVICEID", 0);
     hMirror = XML.getValue("CAM:HMIRROR", false);
@@ -373,11 +376,15 @@ void ofApp::saveSettings(){
     XML.setValue("OSC:ETIQUETA:AVERAGEFLOWINREGION", etiquetaAverageFlowInRegion);
     XML.setValue("OSC:ENVIARAVERAGEFLOWINREGION", enviarAverageFlowInRegion);
     
-    XML.setValue("OSC:ETIQUETA:FLOWINREGION", etiquetaFlowInRegion);
+    XML.setValue("OSC:ETIQUETA:TOREGION", etiquetaToRegion);
     XML.setValue("OSC:ENVIARFLOWINREGION", enviarFlowInRegion);
     
-    XML.setValue("OSC:ETIQUETA:FLOWINPOSITION", etiquetaFlowInPosition);
+    XML.setValue("OSC:ETIQUETA:TOPOSITION", etiquetaToPosition);
     XML.setValue("OSC:ENVIARFLOWINPOSITION", enviarFlowInPosition);
+    
+    XML.setValue("OSC:ETIQUETA:FROMREGION", etiquetaFromRegion);
+    
+    XML.setValue("OSC:ETIQUETA:FROMPOSITION", etiquetaFromPosition);
 
     //---------------- CAM --------------------
     XML.setValue("CAM:DEVICEID", deviceID);
@@ -411,9 +418,6 @@ void ofApp::keyPressed(ofKeyEventArgs& e){
     }
     
     #endif
-    else if(e.key == 'f'){
-        fullScreen = !fullScreen;
-    }
     else if(e.key == 'd'){
         deleteAreas = !deleteAreas;
     }

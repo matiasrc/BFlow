@@ -79,8 +79,6 @@ void ofApp::drawGui(){
             
             static char str1[128];
             strcpy(str1, host.c_str());
-            //static char str1[128] = "127.0.0.1";
-            //ImGui::InputTextWithHint("ip", "enter ip address here", str1, IM_ARRAYSIZE(str1));
             if( ImGui::InputTextWithHint("ip", "enter ip address here",str1, IM_ARRAYSIZE(str1))){
                 host = ofVAArgsToString(str1);
                 sender.setup(host, puertoOUT);
@@ -90,14 +88,9 @@ void ofApp::drawGui(){
             
             ImGui::Separator();
             
-            if(ImGui::InputInt("port de entrada", &puertoIN)) receiver.setup(puertoIN);
-            ImGui::SameLine(); HelpMarker("puerto de ENTRADA");
-            
-            ImGui::Separator();
-            
             static char totalFlowaddress[128];
             strcpy(totalFlowaddress, etiquetaTotalFlow.c_str());
-            if( ImGui::InputTextWithHint("address1", "tipear etiqueta TOTAL FLOW",totalFlowaddress, IM_ARRAYSIZE(totalFlowaddress))){
+            if( ImGui::InputTextWithHint("a1", "tipear etiqueta TOTAL FLOW",totalFlowaddress, IM_ARRAYSIZE(totalFlowaddress))){
                 etiquetaTotalFlow = ofVAArgsToString(totalFlowaddress);
             }
             ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
@@ -107,7 +100,7 @@ void ofApp::drawGui(){
             
             static char averageFlowaddress[128];
             strcpy(averageFlowaddress, etiquetaAverageFlow.c_str());
-            if( ImGui::InputTextWithHint("address2", "tipear etiqueta AVERAGE FLOW",averageFlowaddress, IM_ARRAYSIZE(averageFlowaddress))){
+            if( ImGui::InputTextWithHint("a2", "tipear etiqueta AVERAGE FLOW",averageFlowaddress, IM_ARRAYSIZE(averageFlowaddress))){
                 etiquetaAverageFlow = ofVAArgsToString(averageFlowaddress);
             }
             ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
@@ -117,7 +110,7 @@ void ofApp::drawGui(){
             
             static char totalFlowInRegionaddress[128];
             strcpy(totalFlowInRegionaddress, etiquetaTotalFlowInRegion.c_str());
-            if( ImGui::InputTextWithHint("address3", "tipear etiqueta TOTAL FLOW IN REGION",totalFlowInRegionaddress, IM_ARRAYSIZE(totalFlowInRegionaddress))){
+            if( ImGui::InputTextWithHint("a3", "tipear etiqueta TOTAL FLOW IN REGION",totalFlowInRegionaddress, IM_ARRAYSIZE(totalFlowInRegionaddress))){
                 etiquetaTotalFlowInRegion = ofVAArgsToString(totalFlowInRegionaddress);
             }
             ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
@@ -127,7 +120,7 @@ void ofApp::drawGui(){
             
             static char averageFlowInRegionaddress[128];
             strcpy(averageFlowInRegionaddress, etiquetaAverageFlowInRegion.c_str());
-            if( ImGui::InputTextWithHint("address4", "tipear etiqueta AVERAGE FLOW IN REGION",averageFlowInRegionaddress, IM_ARRAYSIZE(averageFlowInRegionaddress))){
+            if( ImGui::InputTextWithHint("a4", "tipear etiqueta AVERAGE FLOW IN REGION",averageFlowInRegionaddress, IM_ARRAYSIZE(averageFlowInRegionaddress))){
                 etiquetaAverageFlowInRegion = ofVAArgsToString(averageFlowInRegionaddress);
             }
             ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
@@ -135,20 +128,49 @@ void ofApp::drawGui(){
             ImGui::SameLine();ImGui::Checkbox("ENVIAR AFIR", &enviarAverageFlowInRegion);
             ImGui::SameLine(); HelpMarker("habilitar / deshabilitar el envío");
             
-            static char flowInRegionaddress[128];
-            strcpy(flowInRegionaddress, etiquetaFlowInRegion.c_str());
-            if( ImGui::InputTextWithHint("address5", "tipear etiqueta FLOW IN REGION",flowInRegionaddress, IM_ARRAYSIZE(flowInRegionaddress))){
-                etiquetaFlowInRegion = ofVAArgsToString(flowInRegionaddress);
+            //-----------------
+            ImGui::Separator();ImGui::Separator();
+            ImGui::Text("RESPUESTA A PEDIDO");
+            
+           
+            ImGui::Text("Entrada");
+            
+            if(ImGui::InputInt("port de entrada", &puertoIN)) receiver.setup(puertoIN);
+            ImGui::SameLine(); HelpMarker("puerto de ENTRADA");
+            
+            static char toRegionaddress[128];
+            strcpy(toRegionaddress, etiquetaToRegion.c_str());
+            if( ImGui::InputTextWithHint("a5", "tipear etiqueta FLOW IN REGION",toRegionaddress, IM_ARRAYSIZE(toRegionaddress))){
+                etiquetaToRegion = ofVAArgsToString(toRegionaddress);
+            }
+            ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
+            
+            static char toPositionaddress[128];
+            strcpy(toPositionaddress, etiquetaToPosition.c_str());
+            if( ImGui::InputTextWithHint("a6", "tipear etiqueta FLOW IN REGION",toPositionaddress, IM_ARRAYSIZE(toPositionaddress))){
+                etiquetaToPosition = ofVAArgsToString(toPositionaddress);
+            }
+            ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
+            
+            
+            
+            ImGui::Separator();
+            ImGui::Text("Salida");
+            
+            static char fromRegionaddres[128];
+            strcpy(fromRegionaddres, etiquetaFromRegion.c_str());
+            if( ImGui::InputTextWithHint("a7", "tipear etiqueta FLOW IN REGION",fromRegionaddres, IM_ARRAYSIZE(fromRegionaddres))){
+                etiquetaFromRegion = ofVAArgsToString(fromRegionaddres);
             }
             ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
             
             ImGui::SameLine();ImGui::Checkbox("ENVIAR FIR", &enviarFlowInRegion);
             ImGui::SameLine(); HelpMarker("habilitar / deshabilitar el envío");
             
-            static char flowInPositionaddress[128];
-            strcpy(flowInPositionaddress, etiquetaFlowInPosition.c_str());
-            if( ImGui::InputTextWithHint("address6", "tipear etiqueta FLOW IN POSITION",flowInPositionaddress, IM_ARRAYSIZE(flowInPositionaddress))){
-                etiquetaFlowInPosition = ofVAArgsToString(flowInPositionaddress);
+            static char fromPositionaddress[128];
+            strcpy(fromPositionaddress, etiquetaFromPosition.c_str());
+            if( ImGui::InputTextWithHint("a8", "tipear etiqueta FLOW IN POSITION",fromPositionaddress, IM_ARRAYSIZE(fromPositionaddress))){
+                etiquetaFromPosition = ofVAArgsToString(fromPositionaddress);
             }
             ImGui::SameLine(); HelpMarker("etiqueta (debe comenzar con /) ");
             

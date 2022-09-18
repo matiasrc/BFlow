@@ -3,12 +3,14 @@
     <PUERTOIN>12346</PUERTOIN>
     <HOST>127.0.0.1</HOST>
     <ETIQUETA>
-        <TOTALFLOW>/bflow/totalflow</TOTALFLOW>
-        <AVERAGEFLOW>/bflow/averagefow</AVERAGEFLOW>
-        <TOTALFLOWINREGION>/bflow/totalflowinregion</TOTALFLOWINREGION>
-        <AVERAGEFLOWINREGION>/bflow/averageflowinregion</AVERAGEFLOWINREGION>
-        <FLOWINREGION>/bflow/flowinregion</FLOWINREGION>
-        <FLOWINPOSITION>/bflow/flowinposition</FLOWINPOSITION>
+        <TOTALFLOW>/bflow/totalFlow</TOTALFLOW>
+        <AVERAGEFLOW>/bflow/averageFlow</AVERAGEFLOW>
+        <TOTALFLOWINREGION>/bflow/totalFlowInRegion</TOTALFLOWINREGION>
+        <AVERAGEFLOWINREGION>/bflow/averageFlowInRegion</AVERAGEFLOWINREGION>
+        <TOREGION>/toBflow/flowiInRegion</TOREGION>
+        <TOPOSITION>/toBflow/flowInPosition</TOPOSITION>
+        <FROMREGION>/fromBflow/flowInRegion</FROMREGION>
+        <FROMPOSITION>/fromBflow/flowInPosition</FROMPOSITION>
     </ETIQUETA>
     <ENVIARTOTALFLOW>1</ENVIARTOTALFLOW>
     <ENVIARAVERAGEFLOW>1</ENVIARAVERAGEFLOW>

@@ -53,9 +53,7 @@ public:
     //----------------- GUI -------------------
     void drawGui();
     ofxImGui::Gui gui;
-    
-    bool fullScreen;
-        
+            
     //----------------- OSC -------------------
     // out
     ofxOscSender sender;
@@ -65,14 +63,18 @@ public:
     string etiquetaAverageFlow;
     string etiquetaTotalFlowInRegion;
     string etiquetaAverageFlowInRegion;
-    string etiquetaFlowInRegion;
-    string etiquetaFlowInPosition;
+    string etiquetaFromRegion;
+    string etiquetaFromPosition;
     bool enviarTotalFlow;
     bool enviarAverageFlow;
     bool enviarTotalFlowInRegion;
     bool enviarAverageFlowInRegion;
     bool enviarFlowInRegion;
     bool enviarFlowInPosition;
+    
+    string etiquetaToRegion;
+    string etiquetaToPosition;
+    
     
     /*
     /totalFlow
