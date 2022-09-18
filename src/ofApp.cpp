@@ -66,10 +66,8 @@ void ofApp::update() {
         flow.setPolySigma(fbPolySigma);
         flow.setUseGaussian(fbUseGaussian);
         
-       
         flow.calcOpticalFlow(camPixels);
 
-        
         // -------- OSC---------
         glm::vec2 totalFlow = flow.getTotalFlow();
         vector <float> totalFlowData;
