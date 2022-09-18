@@ -75,7 +75,6 @@ public:
     string etiquetaToRegion;
     string etiquetaToPosition;
     
-    
     /*
     /totalFlow
     /averageFlow

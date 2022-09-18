@@ -176,7 +176,6 @@ void ofApp::drawGui(){
             
             ImGui::SameLine();ImGui::Checkbox("ENVIAR FIP", &enviarFlowInPosition);
             ImGui::SameLine(); HelpMarker("habilitar / deshabilitar el envío");
-            
         
             ImGui::EndMenu();
         }

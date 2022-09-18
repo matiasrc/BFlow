@@ -186,8 +186,6 @@ void ofApp::update() {
 
 void ofApp::draw() {
     
-    //ofSetColor(255);
-    
     float w = ofGetWidth();
     float h = ofGetHeight();
     float fw = flow.getWidth();
