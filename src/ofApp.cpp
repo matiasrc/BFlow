@@ -127,6 +127,7 @@ void ofApp::update() {
         if(m.getAddress() == etiquetaToRegion){
 
             if(m.getNumArgs() == 5){
+        
                 // both the arguments are floats
                 float id = m.getArgAsFloat(0);
                 float rx = m.getArgAsFloat(1);
@@ -323,15 +324,15 @@ void ofApp::loadSettings(){
     etiquetaAverageFlowInRegion = XML.getValue("OSC:ETIQUETA:AVERAGEFLOWINREGION", "/bflow/averageflowinregion");
     enviarAverageFlowInRegion = XML.getValue("OSC:ENVIARAVERAGEFLOWINREGION", true);
     
-    etiquetaToRegion = XML.getValue("OSC:ETIQUETA:TOREGION", "/tobflow/flowinregion");
+    etiquetaToRegion = XML.getValue("OSC:ETIQUETA:TOREGION", "/tobflow/flowInRegion");
     enviarFlowInRegion = XML.getValue("OSC:ENVIARFLOWINREGION", true);
     
-    etiquetaToPosition = XML.getValue("OSC:ETIQUETA:TOPOSITION", "/tobflow/flowinposition");
+    etiquetaToPosition = XML.getValue("OSC:ETIQUETA:TOPOSITION", "/tobflow/flowInPosition");
     enviarFlowInPosition = XML.getValue("OSC:ENVIARFLOWINPOSITION", true);
     
-    etiquetaFromRegion = XML.getValue("OSC:ETIQUETA:FROMREGION", "/frombflow/flowinregion");
+    etiquetaFromRegion = XML.getValue("OSC:ETIQUETA:FROMREGION", "/frombflow/flowInRegion");
     
-    etiquetaFromPosition = XML.getValue("OSC:ETIQUETA:FROMPOSITION", "/frombflow/flowinposition");
+    etiquetaFromPosition = XML.getValue("OSC:ETIQUETA:FROMPOSITION", "/frombflow/flowInPosition");
     
     //---------------- CAM --------------------
     deviceID = XML.getValue("CAM:DEVICEID", 0);

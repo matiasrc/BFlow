@@ -7,7 +7,7 @@
         <AVERAGEFLOW>/bflow/averageFlow</AVERAGEFLOW>
         <TOTALFLOWINREGION>/bflow/totalFlowInRegion</TOTALFLOWINREGION>
         <AVERAGEFLOWINREGION>/bflow/averageFlowInRegion</AVERAGEFLOWINREGION>
-        <TOREGION>/toBflow/flowiInRegion</TOREGION>
+        <TOREGION>/toBflow/flowInRegion</TOREGION>
         <TOPOSITION>/toBflow/flowInPosition</TOPOSITION>
         <FROMREGION>/fromBflow/flowInRegion</FROMREGION>
         <FROMPOSITION>/fromBflow/flowInPosition</FROMPOSITION>
