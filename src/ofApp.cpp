@@ -5,8 +5,7 @@ using namespace cv;
 
 void ofApp::setup() {
     ofSetFrameRate(60);
-    //ofSetLogLevel(OF_LOG_VERBOSE);
-	//ofSetVerticalSync(true);
+    ofSetVerticalSync(true);
     
     //----------------- XML -------------------
     loadSettings();
@@ -26,7 +25,14 @@ void ofApp::setup() {
     
     setupCam(deviceID);
     
-    imitate(camPixels, cam);
+    //----------------- WARP -------------------
+     warpON =  false;
+     cualPunto = 0;
+    
+     moverPunto = false;
+     
+     mirroredImg.allocate(camWidth,camHeight);
+     warpedImg.allocate(camWidth,camHeight);
     
     //----------------- FLOW -------------------
     MIN_SIZE = 20;
@@ -44,7 +50,7 @@ void ofApp::setup() {
 }
 
 void ofApp::update() {
-	cam.update();
+    cam.update();
     
     float w = ofGetWidth();
     float h = ofGetHeight();
@@ -52,11 +58,13 @@ void ofApp::update() {
     float fw = flow.getWidth();
     float fh = ofGetHeight();
     
-	if(cam.isFrameNew()) {
+    if(cam.isFrameNew()) {
         
-        copy(cam, camPixels);
+        mirroredImg.setFromPixels(cam.getPixels());
+        mirroredImg.mirror(vMirror, hMirror);
         
-        camPixels.mirror(vMirror, hMirror);
+        warpedImg = mirroredImg;
+        warpedImg.warpPerspective(warp[0], warp[1], warp[2], warp[3]);
         
         flow.setPyramidScale(fbPyrScale);
         flow.setNumLevels(fbLevels);
@@ -66,7 +74,7 @@ void ofApp::update() {
         flow.setPolySigma(fbPolySigma);
         flow.setUseGaussian(fbUseGaussian);
         
-        flow.calcOpticalFlow(camPixels);
+        flow.calcOpticalFlow(warpedImg);
 
         // -------- OSC---------
         glm::vec2 totalFlow = flow.getTotalFlow();
@@ -183,6 +191,7 @@ void ofApp::update() {
             }
         }
     }
+    warpingReset();
 }
 
 void ofApp::draw() {
@@ -192,7 +201,12 @@ void ofApp::draw() {
     float fw = flow.getWidth();
     float fh = flow.getHeight();
         
-    camPixels.draw(0, 0, w, h);
+    if(imageView == 0){
+        mirroredImg.draw(0, 0, w, h);
+    }
+    else if(imageView == 1){
+        warpedImg.draw(0, 0, w, h);
+    }
     flow.draw(0,0,w,h);
     
     ofPushStyle();
@@ -221,6 +235,47 @@ void ofApp::draw() {
         ofDrawBitmapStringHighlight("area: " + ofToString(i), rx, ry);
     }
     ofPopStyle();
+    
+    if(warpON){
+        ofPushStyle();
+        ofFill();
+        ofPolyline pl;
+        
+        float cornerSize = 15;
+        
+        for(int i=0; i<4; i++){
+            float x = warp[i].x / camWidth * w;
+            float y = (warp[i].y / camHeight * h);
+        
+            pl.addVertex(x, y);
+            
+            corner[i].setFromCenter(x, y, cornerSize, cornerSize);
+            
+            ofFill();
+            //ofDrawCircle(x, y, 5);
+            if(i == cualPunto){
+                ofSetColor(255, 0, 0);
+            }else{
+                ofSetColor(0, 255, 255);
+            }
+            ofDrawRectangle(corner[i]);
+        }
+        ofSetColor(0, 255, 255);
+        pl.close();
+        pl.draw();
+        ofPopStyle();
+    }
+    
+    if(deleteAreas){
+        ofPushStyle();
+        ofDrawBitmapStringHighlight("Borrado de zonas activado, presionad tecla d para salir", 5, ofGetHeight() - 5, ofColor(255,0, 0));
+        ofPopStyle();
+    }
+    if(warpON){
+        ofPushStyle();
+        ofDrawBitmapStringHighlight("Deformación de entrada activada, presionad tecla w para salir", 5, ofGetHeight() - 25, ofColor(255,0, 0));
+        ofPopStyle();
+    }
     
     drawGui();
     
@@ -339,6 +394,17 @@ void ofApp::loadSettings(){
     hMirror = XML.getValue("CAM:HMIRROR", false);
     vMirror = XML.getValue("CAM:VMIRROR", false);
     
+    paso = XML.getValue("CAM:WARPING:PASO", 5);
+    
+    warp[0].x = XML.getValue("CAM:WARPING:AX", 0);
+    warp[0].y = XML.getValue("CAM:WARPING:Ay", 0);
+    warp[1].x = XML.getValue("CAM:WARPING:BX", camWidth);
+    warp[1].y = XML.getValue("CAM:WARPING:BY", 0);
+    warp[2].x = XML.getValue("CAM:WARPING:CX", camWidth);
+    warp[2].y = XML.getValue("CAM:WARPING:CY", camHeight);
+    warp[3].x = XML.getValue("CAM:WARPING:DX", 0);
+    warp[3].y = XML.getValue("CAM:WARPING:DY", camHeight);
+    
     //---------------- FLOW --------------------
     fbPyrScale = XML.getValue("FLOW:PYRSCALE", 0.5);
     fbPolySigma = XML.getValue("FLOW:POLYSIGMA", 1.5);
@@ -387,15 +453,25 @@ void ofApp::saveSettings(){
     XML.setValue("CAM:DEVICEID", deviceID);
     XML.setValue("CAM:HMIRROR", hMirror);
     XML.setValue("CAM:VMIRROR", vMirror);
+    
+    XML.setValue("CAM:WARPING:PASO", paso);
+    XML.setValue("CAM:WARPING:AX", warp[0].x);
+    XML.setValue("CAM:WARPING:Ay", warp[0].y);
+    XML.setValue("CAM:WARPING:BX", warp[1].x);
+    XML.setValue("CAM:WARPING:BY", warp[1].y);
+    XML.setValue("CAM:WARPING:CX", warp[2].x);
+    XML.setValue("CAM:WARPING:CY", warp[2].y);
+    XML.setValue("CAM:WARPING:DX", warp[3].x);
+    XML.setValue("CAM:WARPING:DY", warp[3].y);
 
     //---------------- FLOW --------------------
-    XML.setValue("CAM:PYRSCALE", fbPyrScale);
-    XML.setValue("CAM:POLYSIGMA", fbPolySigma);
-    XML.setValue("CAM:LEVELS", fbLevels);
-    XML.setValue("CAM:ITERATIONS", fbIterations);
-    XML.setValue("CAM:POLYN", fbPolyN);
-    XML.setValue("CAM:WINSIZE", fbWinSize);
-    XML.setValue("CAM:GAUSSIAN", fbUseGaussian);
+    XML.setValue("FLOW:PYRSCALE", fbPyrScale);
+    XML.setValue("FLOW:POLYSIGMA", fbPolySigma);
+    XML.setValue("FLOW:LEVELS", fbLevels);
+    XML.setValue("FLOW:ITERATIONS", fbIterations);
+    XML.setValue("FLOW:POLYN", fbPolyN);
+    XML.setValue("FLOW:WINSIZE", fbWinSize);
+    XML.setValue("FLOW:GAUSSIAN", fbUseGaussian);
         
     XML.saveFile("mySettings.xml");
     xmlMessage ="settings saved to xml!";
@@ -418,34 +494,81 @@ void ofApp::keyPressed(ofKeyEventArgs& e){
     else if(e.key == 'd'){
         deleteAreas = !deleteAreas;
     }
+    else if(e.key == '1'){
+        cualPunto = 0;
+    }
+    else if(e.key == '2'){
+        cualPunto = 1;
+    }
+    else if(e.key == '3'){
+        cualPunto = 2;
+    }
+    else if(e.key == '4'){
+        cualPunto = 3;
+    }
+    else if(e.key == 'w'){
+        warpON = !warpON;
+    }
+    else if(e.key == OF_KEY_LEFT && warpON){
+        warp[cualPunto].x -= paso;
+        warp[cualPunto].x = ofClamp(warp[cualPunto].x, 0, camWidth);
+    }
+    else if(e.key == OF_KEY_RIGHT && warpON){
+        warp[cualPunto].x += paso;
+        warp[cualPunto].x = ofClamp(warp[cualPunto].x, 0, camWidth);
+    }
+    else if(e.key == OF_KEY_UP && warpON){
+        warp[cualPunto].y -= paso;
+        warp[cualPunto].y = ofClamp(warp[cualPunto].y, 0, camHeight);
+    }
+    else if(e.key == OF_KEY_DOWN && warpON){
+        warp[cualPunto].y += paso;
+        warp[cualPunto].y = ofClamp(warp[cualPunto].y, 0, camHeight);
+    }
 }
-
 //--------------------------------------------------------------
 void ofApp::keyReleased(ofKeyEventArgs& e){
 }
 
+//--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-    if(!deleteAreas){
+    if(!deleteAreas && !warpON ){
         float mx = ofMap(x, 0, ofGetWidth(), 0, flow.getWidth());
         float my = ofMap(y, 0, ofGetHeight(), 0, flow.getHeight());
         ofVec2f p2(mx,my);
         rect.set(p1,p2.x-p1.x,p2.y-p1.y);
         drawRect = true;
     }
+    if(moverPunto){
+        if(x >= 0 && x<= ofGetWidth() && y>=0 && y <=ofGetHeight()){
+            warp[cualPunto].x = ofMap(x, 0, ofGetWidth(), 0, camWidth);
+            warp[cualPunto].y = ofMap(y, 0, ofGetHeight(), 0, camHeight);
+        }
+    }
 }
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
     
-    if(!deleteAreas){
-        float mx = ofMap(x, 0, ofGetWidth(), 0, flow.getWidth());
-        float my = ofMap(y, 0, ofGetHeight(), 0, flow.getHeight());
-        p1.set(mx,my);
+    if(warpON){
+        for(int i=0; i<4; i++){
+            if(corner[i].inside(x, y)){
+                cualPunto = i;
+                moverPunto = true;
+                break;
+            }
+        }
+    }else{
+        if(!deleteAreas){
+            float mx = ofMap(x, 0, ofGetWidth(), 0, flow.getWidth());
+            float my = ofMap(y, 0, ofGetHeight(), 0, flow.getHeight());
+            p1.set(mx,my);
+        }
     }
 }
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
     drawRect = false;
-    if(!deleteAreas){
+    if(!deleteAreas && !warpON){
         float mx = ofClamp(ofMap(x, 0, ofGetWidth(), 0, flow.getWidth()),0, flow.getWidth() );
         float my = ofClamp(ofMap(y, 0, ofGetHeight(), 0, flow.getHeight()), 0, flow.getHeight());
         
@@ -458,5 +581,24 @@ void ofApp::mouseReleased(int x, int y, int button){
             areas.push_back(r);
         }
     }
+    moverPunto = false;
 }
+
+//--------------------------------------------------------------
+void ofApp::warpingReset(){
+    
+    if(resetWarping){
+        A = ofPoint(0, 0);
+        B = ofPoint(camWidth, 0);
+        C = ofPoint(camWidth, camHeight);
+        D = ofPoint(0, camHeight);
+        
+        warp[0] = A;
+        warp[1] = B;
+        warp[2] = C;
+        warp[3] = D;
+        resetWarping = false;
+    }
+}
+
 

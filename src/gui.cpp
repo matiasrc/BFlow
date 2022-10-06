@@ -67,11 +67,18 @@ void ofApp::drawGui(){
                 ImGui::Separator();
                 ImGui::Checkbox("ESPEJAR HORIZONTAL", &hMirror);
                 ImGui::Checkbox("ESPEJAR VERTICAL", &vMirror);
+                
+                ImGui::Separator(); ImGui::Separator();
+                ImGui::Text("Ajustar perspectiva");
+                ImGui::SameLine(); HelpMarker("Ajuste de perspectiva de la imagen de entrada -> seleccionar los puntos con las teclas 1, 2, 3 y 4 ||  mover con el mouse o las flechas del teclado");
+                ImGui::Checkbox("habilitar (tecla w)", &warpON);
+                ImGui::InputInt("paso", &paso);
+                if (ImGui::Button("Resetear perspectiva")){
+                     resetWarping = true;
+                }
                         
             ImGui::EndMenu();
-
         }
-        
         if (ImGui::BeginMenu("|OSC|"))
         {
             if(ImGui::InputInt("port de salida", &puertoOUT)) sender.setup(host, puertoOUT);
@@ -179,6 +186,13 @@ void ofApp::drawGui(){
         
             ImGui::EndMenu();
         }
+        if (ImGui::BeginMenu("|ver|"))
+               {
+                   ImGui::RadioButton("original", &imageView, 0);
+                   ImGui::RadioButton("transformada", &imageView, 1);
+    
+                   ImGui::EndMenu();
+               }
         if (ImGui::BeginMenu("|Acerca|"))
         {
             ImGui::Text("BFlow");
@@ -192,21 +206,10 @@ void ofApp::drawGui(){
 
             ImGui::EndMenu();
         }
-        /*
-        if (ImGui::BeginMenu("| Guardar", "cmd+s"))
-        {
-            saveSettings();
-            ofLogVerbose() << "Configuración guardada";
-            if (ImGui::MenuItem("Guardar", "cmd+s")) {
-                saveSettings();
-                ofLogVerbose() << "Configuración guardada";
-            }
-            
-            ImGui::EndMenu();
-        }
-        */
+
         ImGui::EndMainMenuBar();
     }
     // Menú flotante
     gui.end();
 }
+
