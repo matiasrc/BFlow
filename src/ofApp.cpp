@@ -486,7 +486,7 @@ void ofApp::keyPressed(ofKeyEventArgs& e){
         saveSettings();
     }
     #else
-    else if(e.key == 19 ){
+    if(e.key == 19 ){
         saveSettings();
     }
     
