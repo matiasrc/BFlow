@@ -187,12 +187,11 @@ void ofApp::drawGui(){
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("|ver|"))
-               {
-                   ImGui::RadioButton("original", &imageView, 0);
-                   ImGui::RadioButton("transformada", &imageView, 1);
-    
-                   ImGui::EndMenu();
-               }
+        {
+            ImGui::RadioButton("original", &imageView, 0);
+            ImGui::RadioButton("transformada", &imageView, 1);
+            ImGui::EndMenu();
+        }
         if (ImGui::BeginMenu("|Acerca|"))
         {
             ImGui::Text("BFlow");
