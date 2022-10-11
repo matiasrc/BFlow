@@ -310,10 +310,10 @@ void ofApp::resetCameraSettings(int devID){
     
     if(cam.isInitialized()){
         cam.close();
-        //cam = new ofVideoGrabber();
-        cam.setDeviceID(deviceID);
-        cam.setup(camWidth, camHeight);
     }
+    //cam = new ofVideoGrabber();
+    cam.setDeviceID(deviceID);
+    cam.setup(camWidth, camHeight);
 }
 
 //--------------------------------------------------------------
