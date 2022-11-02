@@ -128,9 +128,8 @@ void ofApp::update() {
     
     recibirOsc();
     
-    while(inMessages.size() > 0){
-        
-        ofxOscMessage m = inMessages[0];
+    for(int i = 0; i<inMessages.size(); i++){
+        ofxOscMessage m = inMessages[i];
         
         if(m.getAddress() == etiquetaToRegion){
 
@@ -138,10 +137,10 @@ void ofApp::update() {
         
                 // both the arguments are floats
                 float id = m.getArgAsFloat(0);
-                float rx = m.getArgAsFloat(1);
-                float ry = m.getArgAsFloat(2);
-                float rw = m.getArgAsFloat(3);
-                float rh = m.getArgAsFloat(4);
+                float rx = ofClamp(m.getArgAsFloat(1), 0, 1);
+                float ry = ofClamp(m.getArgAsFloat(2), 0, 1);
+                float rw = ofClamp(m.getArgAsFloat(3), 0, 1);
+                float rh = ofClamp(m.getArgAsFloat(4), 0, 1);
                 
                 vector <float> averageFlowInRegionData;
                 
@@ -161,8 +160,8 @@ void ofApp::update() {
                 
                 // arguments are floats
                 float id = m.getArgAsFloat(0);
-                float x = m.getArgAsFloat(1);
-                float y = m.getArgAsFloat(2);
+                float x = ofClamp(m.getArgAsFloat(1), 0, 1);
+                float y = ofClamp(m.getArgAsFloat(2), 0, 1);
                                 
                 vector <float> flowInPositionData;
                 
@@ -175,7 +174,6 @@ void ofApp::update() {
                 enviarOsc(etiquetaFromPosition, flowInPositionData);
             }
         }
-        inMessages.erase(inMessages.begin());
     }
     
     if(deleteAreas){
@@ -335,6 +333,7 @@ void ofApp::enviarOsc(string etiqueta, vector<float> valores){
 //--------------------------------------------------------------
 void ofApp::recibirOsc(){
     
+    inMessages.clear();
     while(receiver.hasWaitingMessages()){
         // get the next message
         ofxOscMessage m;
@@ -396,13 +395,13 @@ void ofApp::loadSettings(){
     
     paso = XML.getValue("CAM:WARPING:PASO", 5);
     
-    warp[0].x = XML.getValue("CAM:WARPING:AX", 0);
-    warp[0].y = XML.getValue("CAM:WARPING:Ay", 0);
+    warp[0].x = XML.getValue("CAM:WARPING:AX", 0.0);
+    warp[0].y = XML.getValue("CAM:WARPING:Ay", 0.0);
     warp[1].x = XML.getValue("CAM:WARPING:BX", camWidth);
-    warp[1].y = XML.getValue("CAM:WARPING:BY", 0);
+    warp[1].y = XML.getValue("CAM:WARPING:BY", 0.0);
     warp[2].x = XML.getValue("CAM:WARPING:CX", camWidth);
     warp[2].y = XML.getValue("CAM:WARPING:CY", camHeight);
-    warp[3].x = XML.getValue("CAM:WARPING:DX", 0);
+    warp[3].x = XML.getValue("CAM:WARPING:DX", 0.0);
     warp[3].y = XML.getValue("CAM:WARPING:DY", camHeight);
     
     //---------------- FLOW --------------------
